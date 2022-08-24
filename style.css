@@ -1,0 +1,7 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.colored-toast.swal2-icon-success {
+    background-color: #a5dc86 !important;
+}
