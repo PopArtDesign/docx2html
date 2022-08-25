@@ -20,44 +20,55 @@ const alert = Swal.mixin({
     timerProgressBar: true,
 })
 
-const success = (title = 'Success!') => {
-    return alert.fire({
-        title,
-        icon: 'success',
-    })
+const alertSuccess = async (title = 'Success!') => {
+    return alert.fire({ title, icon: 'success' })
 }
 
-input.addEventListener('change', (event) => {
-    readFileInputEventAsArrayBuffer(event, (arrayBuffer) => {
-        output.value = 'Processing...'
-
-        mammoth.convertToHtml({ arrayBuffer: arrayBuffer })
-            .then((result) => {
-                const html = beautify.html(
-                    // Remove NO-BREAK SPACE. See https://unicode-explorer.com/c/00A0
-                    result.value.replace(/\u00A0/g, ' ')
-                )
-
-                output.value = beautify.html(html)
-
-                success('Done!')
-            })
-    })
-}, false)
+const alertError = async (title = 'Error!') => {
+    return alert.fire({ title, icon: 'error' })
+}
 
 copyButton.addEventListener('click', (event) => {
-    navigator.clipboard.writeText(output.value).then(result => success('Copied!'))
+    navigator.clipboard
+        .writeText(output.value)
+        .then(result => alertSuccess('Copied!'))
 })
 
-const readFileInputEventAsArrayBuffer = (event, callback) => {
-    const file = event.target.files[0]
+input.addEventListener('change', async (event) => {
+    output.value = 'Processing...'
 
-    const reader = new FileReader()
+    const [ file ] = event.target.files
 
-    reader.onload = function(loadEvent) {
-        const arrayBuffer = loadEvent.target.result
-        callback(arrayBuffer)
-    };
+    try {
+        const html = await convertFile(file)
+    } catch (e) {
+        output.value = ''
 
-    reader.readAsArrayBuffer(file)
+        alertError('Error!')
+
+        throw e
+    }
+
+    const html = await convertFile(file)
+
+    output.value = html
+
+    alertSuccess('Done!')
+})
+
+const convertFile = async (file) => {
+    const arrayBuffer = await file.arrayBuffer()
+
+    const rawHtml = await mammoth.convertToHtml({ arrayBuffer })
+
+    const html = beautifyHtml(rawHtml.value)
+
+    return html
+}
+
+const beautifyHtml = (html) => {
+    return beautify.html(
+        // Remove NO-BREAK SPACE. See https://unicode-explorer.com/c/00A0
+        html.replace(/\u00A0/g, ' ')
+    )
 }
