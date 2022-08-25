@@ -16,6 +16,7 @@
   "dependencies": {
     "js-beautify": "^1.14.6",
     "mammoth": "^1.4.21",
+    "prismjs": "^1.29.0",
     "sweetalert2": "^11.4.29"
   }
 }

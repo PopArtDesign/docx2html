@@ -3,10 +3,13 @@ import './style.css'
 import mammoth from 'mammoth/mammoth.browser.js'
 import beautify from 'js-beautify'
 import Swal from 'sweetalert2'
+import Prism from 'prismjs'
 
 const input = document.querySelector('#file')
 const output = document.querySelector('#output')
 const copyButton = document.querySelector('#copy')
+
+let result = ''
 
 const alert = Swal.mixin({
     toast: true,
@@ -30,28 +33,26 @@ const alertError = async (title = 'Error!') => {
 
 copyButton.addEventListener('click', (event) => {
     navigator.clipboard
-        .writeText(output.value)
+        .writeText(result)
         .then(result => alertSuccess('Copied!'))
 })
 
 input.addEventListener('change', async (event) => {
-    output.value = 'Processing...'
+    result = ''
+    output.innerText = 'Processing...'
 
     const [ file ] = event.target.files
 
     try {
-        const html = await convertFile(file)
+        result = await convertFile(file)
     } catch (e) {
-        output.value = ''
-
+        output.innerText = ''
         alertError('Error!')
 
         throw e
     }
 
-    const html = await convertFile(file)
-
-    output.value = html
+    output.innerHTML = Prism.highlight(result, Prism.languages.html, 'html')
 
     alertSuccess('Done!')
 })
