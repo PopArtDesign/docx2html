@@ -2,7 +2,7 @@ import './style.css'
 
 import mammoth from 'mammoth/mammoth.browser.js'
 import beautify from 'js-beautify'
-import Swal from 'sweetalert2'
+import Swal from 'sweetalert2-neutral'
 import Prism from 'prismjs'
 
 const input = document.querySelector('#file')
